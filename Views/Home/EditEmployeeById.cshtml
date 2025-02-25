@@ -1,0 +1,398 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model Employee_Crud_operation.Models.EmployeeMaster
+
+
+<h1>Edit Employee</h1>
+
+@Html.ActionLink("<--- Back", "Index", "Home", null, new { @class = "back-link" })
+@* <form method="post" action="@Url.Action("UpdateEmployeeData", "Home")"> *@
+<form method="post" enctype="multipart/form-data" action="@Url.Action("UpdateEmployeeData", "Home")">
+    <table class="table">
+        <thead>
+            
+        </thead>
+        <tbody>
+            <tr style="display:none">
+                <td class="headerstyle"><label for="Row_Id">Row Id</label></td>
+                <td><input type="number" class="form-control"  id="Row_Id" name="Row_Id" value="@Model.Row_Id" readonly  /></td>
+            </tr>
+           
+            <tr>
+                <td class="headerstyle"><label for="FirstName">First Name</label></td>
+                <td><input type="text" class="form-control" id="FirstName" name="FirstName" value="@Model.FirstName" required /></td>
+            </tr>
+
+            <tr>
+                <td class="headerstyle"><label for="LastName">Last Name</label></td>
+                <td><input type="text" class="form-control" id="LastName" name="LastName" value="@Model.LastName" required /></td>
+            </tr>
+
+            <tr>
+                <td class="headerstyle"><label for="EmailAddress"><span style="color: red;">*</span></label> Email Address</label></td>
+                <td><input type="email" class="form-control" id="EmailAddress" name="EmailAddress" value="@Model.EmailAddress" required onblur="checkUniqueness()" /></td>
+            </tr>
+            <tr>
+                <td class="headerstyle"><label for="MobileNumber"><span style="color: red;">*</span></label> Mobile Number</label></td>
+                <td><input type="text" class="form-control" id="MobileNumber" name="MobileNumber" value="@Model.MobileNumber" required onblur="checkUniqueness()" oninput="validateMobileNumber()" /></td>
+            </tr>
+
+            <tr>
+                <td class="headerstyle"><label for="PanNumber">Pan Number</label></td>
+                <td><input type="text" class="form-control" id="PanNumber" name="PanNumber" value="@Model.PanNumber" required oninput="this.value = this.value.toUpperCase()" onblur="checkUniqueness()" /></td>
+            </tr>
+
+            <tr>
+                <td class="headerstyle"><label for="PassportNumber">Passport Number</label></td>
+                <td><input type="text" class="form-control" id="PassportNumber" name="PassportNumber" value="@Model.PassportNumber" required oninput="this.value = this.value.toUpperCase()" onblur="checkUniqueness()" /></td>
+            </tr>
+
+            <tr>
+                <td class="headerstyle"><label for="DateOfBirth">Date of Birth</label></td>
+                <td><input type="date" class="form-control" id="DateOfBirth" name="DateOfBirth" value="@Model.DateOfBirth" required/></td>
+            </tr>
+
+            <tr>
+                <td class="headerstyle"><label for="DateOfJoinee">Date of Join</label></td>
+                <td><input type="date" class="form-control" id="DateOfJoinee" name="DateOfJoinee" value="@Model.DateOfJoinee" required/></td>
+            </tr>
+            <tr>
+                <td class="headerstyle"><label for="CountryId">Country</label></td>
+                <td>
+                    <select id="CountryId" name="CountryId" class="form-control" onchange="fetchStates()" required>
+                        <option value="">Select Country</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="headerstyle"><label for="StateId">State</label></td>
+                <td>
+                    <select id="StateId" name="StateId" class="form-control" onchange="fetchCities()" required>
+                        <option value="">Select State</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="headerstyle"><label for="CityId">City</label></td>
+                <td>
+                    <select id="CityId" name="CityId" class="form-control" required>
+                        <option value="">Select City</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="headerstyle"><label for="IsActive">Is Active</label></td>
+                <td><input type="checkbox" id="IsActive" name="IsActive" @(Model.IsActive == 1 ? "checked" : "") /></td>
+            </tr>
+            <tr>
+                <td class="headerstyle"><label for="ProfileImage"><span style="color: red;">*</span></label> Profile Image </label></td>
+                <td>
+                    <input type="file" class="form-control" id="ProfileImage" name="ProfileImage" required />
+                    <br/>
+                    @if (!string.IsNullOrEmpty(Model.ProfileImage))
+                    {
+                        <img src="@Url.Content( "~"+Model.ProfileImage)" alt="Profile Image" width="100" height="100" />
+                    }
+
+                </td>
+            </tr>
+
+   
+            <input type="text" class="form-control" id="OldProfileImage" name="OldProfileImage" style="visibility:hidden"  value="@Model.ProfileImage" />
+                 
+        </tbody>
+    </table>
+
+    @* <button type="submit" class="btn btn-primary" style="background-color:green" onclick="UpdateEmployee()">Update Changes</button> *@
+
+</form>
+<button type="submit" class="btn btn-primary" style="background-color:green" onclick="UpdateEmployee()">Update Changes</button>
+
+<style>
+
+    .custom-dropdown {
+        background-color: #f9f9f9; /* Light gray background */
+        border: 1px solid #ccc; /* Light gray border */
+        border-radius: 8px; /* Rounded corners */
+        padding: 5px 10px; /* Reduced padding for a compact look */
+        width: 20%; /* Full width */
+        box-sizing: border-box; /* Include padding and border in width */
+        font-size: 14px; /* Smaller font size */
+        height: 30px; /* Reduce height */
+    }
+    form .form-group label {
+        font-weight: bold;
+    }
+    .back-link {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        color: white;
+        background-color: #5bc0de;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s;
+        align-content:center;
+    }
+
+    .headerstyle {
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    #loader {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, 0.8); 
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<div id="loader" style="display:none;">
+    <img src="/images/loader.gif" alt="Loading...">
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery should be loaded first -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css"> <!-- DataTables CSS -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script> <!-- DataTables JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.18/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.18/dist/sweetalert2.all.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+<script type="text/javascript">
+    var dropdownData;
+       $(document).ready(function () {
+        $.ajax({
+            url: '@Url.Action("GetAllDropdownsData", "Home")',
+            type: 'GET',
+            success: function (data) {
+               // console.log(data);
+               dropdownData=data;
+                $.each(data.countries, function (index, country) {
+                    $('#CountryId').append('<option value="' + country.id + '">' + country.name + '</option>');
+                });
+
+                $.each(data.states, function (index, state) {
+                    $('#StateId').append('<option value="' + state.id + '">' + state.name + '</option>');
+                });
+
+                $.each(data.cities, function (index, city) {
+                    $('#CityId').append('<option value="' + city.id + '">' + city.name + '</option>');
+                });
+                      $('#CountryId').val('@Model.CountryId');
+                      $('#StateId').val('@Model.StateId');
+                      $('#CityId').val('@Model.CityId');
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching dropdown data:', error);
+            }
+        });
+    });
+
+       function validateMobileNumber()
+        {
+        var mobileNumberInput = document.getElementById('MobileNumber');
+        var mobileNumber = mobileNumberInput.value;
+        mobileNumber = mobileNumber.replace(/[^0-9]/g, '');
+        if (mobileNumber.length > 10) {
+            mobileNumber = mobileNumber.substring(0, 10);
+        }
+        mobileNumberInput.value = mobileNumber;
+        if (mobileNumber.length !== 10) {
+
+            document.getElementById('mobileNumberError').innerText = "Mobile number must be 10 digits.";
+        } else {
+            document.getElementById('mobileNumberError').innerText = "";
+        }
+    }
+    //---
+    function UpdateEmployee()
+    {
+         $('#loader').show();
+         var currentValue = $('#OldProfileImage').val();
+    var updatedValue = currentValue.replace('/uploads/', '');
+    $('#OldProfileImage').val(updatedValue);
+
+         var formData = new FormData();
+         debugger;
+     // Get form data
+     formData.append('FirstName', $('#FirstName').val());
+     formData.append('LastName', $('#LastName').val());
+     formData.append('EmailAddress', $('#EmailAddress').val());
+     formData.append('MobileNumber', $('#MobileNumber').val());
+     formData.append('PanNumber', $('#PanNumber').val());
+     formData.append('PassportNumber', $('#PassportNumber').val());
+     formData.append('DateOfBirth', $('#DateOfBirth').val());
+      formData.append('DateOfJoinee', $('#DateOfJoinee').val());
+     formData.append('CountryId', parseInt($('#CountryId').val(), 10));
+     formData.append('StateId', parseInt($('#StateId').val(), 10));
+     formData.append('CityId', parseInt($('#CityId').val(), 10));
+     formData.append("ProfileImage", $('#ProfileImage')[0].files[0]);
+     //formData.append('Gender', $('input[name="gender"]:checked').val());
+     formData.append('IsActive', $('#IsActive').val());
+     formData.append('Row_Id', parseInt($('#Row_Id').val(), 10));
+           formData.append("ProfileImage", $('#OldProfileImage').val());
+
+  
+     var isValid = true;
+        var errorMessage = "";
+
+        formData.forEach(function(value, key) {
+            if ( !value || (typeof value === 'number' && isNaN(value))  || isNaN(parseInt($('#CityId').val(),10)) || isNaN(parseInt($('#CountryId').val(),10)) || isNaN(parseInt($('#StateId').val(),10)) || !$('#ProfileImage')[0].files[0] ) {
+                isValid = false;
+                errorMessage += key + " is required.\n";
+            }
+        });
+
+        if (!isValid) {
+            $('#loader').hide();
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: errorMessage,
+                confirmButtonText: 'OK'
+            });
+            return; // Stop further execution if validation fails
+        }
+
+        $.ajax({
+            url: '@Url.Action("UpdateEmployeeData", "Home")',
+            type: 'POST',          
+            data: formData,
+             contentType: false, // Required for file upload
+            processData: false, // Required for file upload
+            success: function (response) {
+                 $('#loader').hide();
+                // alert("Data Updated successfully");
+                // $('#responseMessage').html('<div class="alert alert-success">Employee Updated successfully!</div>');
+                // window.location.href = '@Url.Action("Index", "Home")';
+                if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: response.message,
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                       //    window.location.href = '@Url.Action("Index", "Home")';
+                           GetEmployeeList1();
+                    }
+                });
+
+           }
+            else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: response.message,
+                    confirmButtonText: 'OK'
+                });
+            }
+            },
+             error: function (xhr, status, error) {
+            $('#loader').hide();
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred: ' + error,
+                confirmButtonText: 'OK'
+            });
+        }
+            // error: function (xhr, status, error) {
+            //      $('#loader').hide();
+            //     $('#responseMessage').html('<div class="alert alert-danger">Error occurred: ' + error + '</div>');
+            // }
+        });
+    }
+    //---
+      function fetchStates() {
+        var countryId = $('#CountryId').val();
+
+        // Clear existing states and cities
+        $('#StateId').empty().append('<option value="">Select State</option>');
+        $('#CityId').empty().append('<option value="">Select City</option>');
+
+        if (countryId) {
+            // Filter states by selected countryId
+            var filteredStates = dropdownData.states.filter(function(state) {
+                return state.stateId == countryId;
+            });
+
+            // Populate the states dropdown
+            $.each(filteredStates, function (index, state) {
+                $('#StateId').append('<option value="' + state.id + '">' + state.name + '</option>');
+            });
+        }
+    }
+
+    function fetchCities() {
+        var stateId = $('#StateId').val();
+
+        // Clear existing cities
+        $('#CityId').empty().append('<option value="">Select City</option>');
+
+        if (stateId) {
+            // Filter cities by selected stateId
+            var filteredCities = dropdownData.cities.filter(function(city) {
+                return city.stateId == stateId;
+            });
+
+            // Populate the cities dropdown
+            $.each(filteredCities, function (index, city) {
+                $('#CityId').append('<option value="' + city.id + '">' + city.name + '</option>');
+            });
+        }
+    }
+
+    function checkUniqueness() {
+        var panNumber = $('#PanNumber').val().toUpperCase();
+        var passportNumber = $('#PassportNumber').val().toUpperCase();
+          var email = $('#EmailAddress').val();
+            var mobile = $('#MobileNumber').val();
+        $.ajax({
+            url: '@Url.Action("CheckUniquePanAndPassport", "Home")',
+            type: 'POST',
+            data: {
+                PanNumber: panNumber,
+                PassportNumber: passportNumber ,
+                emailaddress :email,
+                    mobilenumber: mobile
+            },
+            success: function(response) {
+            if (!response.isUnique) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: response.message,
+                confirmButtonText: 'OK'
+            }).then(function(result) {
+                // Clearing the input fields after the alert is closed
+                if (result.isConfirmed) {
+                    $j('#PanNumber').val('');
+                    $j('#PassportNumber').val('');
+                }
+            });
+        }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error during uniqueness check:', error);
+            }
+        });
+    }
+
+</script>

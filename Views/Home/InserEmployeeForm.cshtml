@@ -1,0 +1,710 @@
+﻿@*
+
+*@
+@{
+    ViewData["Title"] = "Create Employee";
+}
+@using Employee_Crud_operation.Controllers
+
+<h1>Add New Employee</h1>
+
+@* <form method="post"> *@
+@* 
+<form id="editEmployeeForm" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="FirstName">First Name</label>
+        <input type="text" class="form-control" id="FirstName" name="firstName" required />
+    </div>
+    <!-- Other fields for Last Name, Email, etc. -->
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+</form>
+ *@
+@using (Html.BeginForm("InsertEmployeeData", "Home", FormMethod.Post, new { enctype = "multipart/form-data", id = "employeeForm" }))
+{
+    <table class="table">
+        <tr>
+            <td class="headerstyle"><label for="FirstName"><span style="color: red;">*</span>First Name</label></td>
+            <td><input type="text" id="FirstName" name="FirstName" class="form-control" required /></td>
+        </tr>
+        <tr>
+            <td class="headerstyle"><label for="LastName"><span style="color: red;">*</span>Last Name</label></td>
+            <td><input type="text" id="LastName" name="LastName" class="form-control" required /></td>
+        </tr>
+        <tr>
+            <td class="headerstyle"><label for="EmailAddress"><span style="color: red;">*</span>Email Address</label></td>
+            <td><input type="email" id="EmailAddress" name="EmailAddress" class="form-control" required onblur="checkUniqueness()" /></td>
+        </tr>
+        <tr>
+            <td class ="headerstyle"><label for="MobileNumber"><span style="color: red;">*</span>Mobile Number</label></td>
+            <td><input type="text" id="MobileNumber" name="MobileNumber" class="form-control" required onblur="checkUniqueness()" oninput="validateMobileNumber()" /></td>
+        </tr>
+        <tr>
+            <td class="headerstyle"><label for="PanNumber">Pan Number</label></td>
+            <td><input type="text" id="PanNumber" name="PanNumber" class="form-control" required onblur="checkUniqueness()" oninput="this.value = this.value.toUpperCase()" /></td>
+        </tr>
+        <tr>
+            <td class="headerstyle"><label for="passportNumber">Passport Number</label></td>
+            <td><input type="text" id="passportNumber" name="passportNumber" class="form-control" required onblur="checkUniqueness()" oninput="this.value = this.value.toUpperCase()" /></td>
+        </tr>
+        <tr>
+            <td class="headerstyle"><label for="DateOfBirth">Date of Birth</label></td>
+            <td><input type="date" id="DateOfBirth" name="DateOfBirth" class="form-control" required /></td>
+        </tr>
+        <tr>
+            <td class="headerstyle"><label for="DateOfJoinee">Date of Join</label></td>
+            <td><input type="date" id="DateOfJoinee" name="DateOfJoinee" class="form-control" required /></td>
+        </tr>
+      
+        <tr>
+            <td class="headerstyle"><label for="CountryId">Country</label></td>
+            <td>
+                <select id="CountryId" name="CountryId" class="form-control" onchange="fetchStates()" required>
+                    <option value="">Select Country</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="headerstyle"><label for="StateId">State</label></td>
+            <td>
+                <select id="StateId" name="StateId" class="form-control" onchange="fetchCities()" required>
+                    <option value="">Select State</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="headerstyle"><label for="CityId">City</label></td>
+            <td>
+                <select id="CityId" name="CityId" class="form-control" required>
+                    <option value="">Select City</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td class="headerstyle"><label for="ProfileImageFile"><span style="color: red;">*</span>Profile Picture</label></td>
+            <td><input type="file" id="ProfileImageFile" name="ProfileImageFile" class="form-control" required/></td>
+        </tr>
+        <tr>
+            <td class="headerstyle"><label>Gender</label></td>
+            <td class="form-control">
+                <input type="radio" id="GenderMale" name="gender" value="Male"  />
+                <label for="GenderMale">Male</label>
+                <input type="radio" id="GenderFemale" name="gender" value="Female"  />
+                <label for="GenderFemale">Female</label>
+            </td>
+        </tr>
+        <tr>
+            <td class="headerstyle"><label for="IsActive">isActive</label></td>
+            <td><input type="checkbox" id="IsActive" name="isActive"/></td>
+        </tr>
+       @*  <tr>
+            <td colspan="2" style="text-align: center;">
+                <button type="submit" class="btn btn-success" id="save" style="background-color:green ; width:150px; align-items:end" onclick="saveEmployee()">Save</button>
+            </td>
+        </tr> *@
+    </table>
+    
+}
+
+
+        <div>
+    <button type="submit" id="Save" class="btn btn-primary" style="background-color:green" onclick="saveEmployee()">Save</button>
+        </div>
+<br />
+<br />
+        @* } *@
+<div style=" display: flex; gap: 10px; align-items: center">
+    <button type="submit" class="btn btn-primary" style="background-color:burlywood ;align-content:end" id="listEmployeesBtn" >List Of Employeess</button>
+    
+    <button class="btn btn-primary" style="background-color:green " id="addEmployeeBtn" >Add Employee</button>
+</div>
+<br />
+@* </form> *@
+
+<style>
+
+    .custom-dropdown {
+        background-color: #f9f9f9; /* Light gray background */
+        border: 1px solid #ccc; /* Light gray border */
+        border-radius: 8px; /* Rounded corners */
+        padding: 5px 10px; /* Reduced padding for a compact look */
+        width: 20%; /* Full width */
+        box-sizing: border-box; /* Include padding and border in width */
+        font-size: 14px; /* Smaller font size */
+        height: 30px; /* Reduce height */
+    }
+    .headerstyle {
+        font-size: 16px;
+        font-weight: bold;
+    }
+    #responseMessage {
+        display: none; 
+        margin-top: 20px;
+    }
+
+        #responseMessage.success {
+            display: block;
+        }
+
+    #loader {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, 0.8); 
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css"> 
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.18/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.18/dist/sweetalert2.all.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+
+
+<div id="loader" style="display:none;">
+    <img src="/images/loader.gif" alt="Loading...">
+</div>
+
+<table id="employeeTable" class="display" >  
+    <thead>
+        <tr>
+            <th >First Name</th>
+            <th >Last Name</th>
+            <th >Email</th>
+            <th >Mobile Number</th>
+            <th >Pan Number</th>
+            <th >Passport Number</th>
+           <th >Date of Birth</th>
+            <th >Date of Join</th>
+            <th >Country Name</th>
+            <th >State Name</th>
+            <th >City Name</th>
+            <th >Gender</th>
+            <th >Is Active</th>
+            <th >Profile Image</th>
+            <th >Actions</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+     
+    </tbody>
+</table>
+<script type="text/javascript">
+
+    //     $(document).ready(function() {
+          
+    //     $('#employeeTable').DataTable({
+    //         "paging": true,           
+    //         "searching": true,        
+    //         "ordering": true,         
+    //         "info": true,            
+    //         "autoWidth": false,       
+    //         "columnDefs": [
+    //             { "orderable": false, "targets": 13 } 
+    //         ]
+    //     });
+    // });
+    //---------
+        $(document).on('click', '.edit-btn', function () {
+
+        var employeeId = $(this).data('id'); 
+          // $('#employeeTable tbody').html(tableRows);
+        window.location.href = '@Url.Action("EditEmployeeById", "Home")' + "?id=" + employeeId;
+    });
+    
+$(document).on('click', '.delete-btn', function () {
+    var employeeId = $(this).data('id'); 
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'You won\'t be able to revert this!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'No',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '@Url.Action("DeleteEmployeeById", "Home")',
+                type: 'POST',
+                data: { id: employeeId },
+                success: function (response) {
+                    GetEmployeeList1();
+                    Swal.fire(
+                        'Deleted!',
+                        'The employee has been deleted.',
+                        'success'
+                    );
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire(
+                        'Error!',
+                        'There was an error deleting the employee. Please try again.',
+                        'error'
+                    );
+                }
+            });
+        }
+    });
+});
+  
+    
+      $(document).on('click', '.edit-btn1', function () {
+        var employeeId = $(this).data('id');
+
+        $.ajax({
+             url: '@Url.Action("EditEmployeeById", "Home")', 
+            type: 'GET',
+            data: { id: employeeId },
+              success: function (response) {
+                 debugger;
+                 window.location.href = '@Url.Action("EditEmployeeById", "Home")' + "?id=" + employeeId;
+              },
+  
+            error: function (xhr, status, error) {
+                alert('Error fetching employee data: ' + error);
+            }
+        });
+    });
+
+
+   function saveEmployee()
+    {
+        var today = new Date().toISOString().split('T')[0];
+    $('#DateOfBirth').attr('max', today);
+        var dateOfBirth = $('#DateOfBirth').val();
+        var dateOfJoinee = $('#DateOfJoinee').val();
+        if (dateOfBirth > today) {
+            Swal.fire({
+                icon: 'error',
+                    title:  'Ooops!!',
+                text: 'Date of Birth cannot be in the future.'
+            });
+            return; 
+        }
+
+        if (dateOfBirth && dateOfJoinee) {
+            var birthDate = new Date(dateOfBirth);
+            var joinDate = new Date(dateOfJoinee);
+            var minJoinDate = new Date(birthDate);
+            minJoinDate.setFullYear(birthDate.getFullYear() + 18);
+
+            if (joinDate < minJoinDate) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Ooops!!',
+                    text: 'Date of Join should be at least 18 years after Date of Birth.'
+                });
+                return;  
+            }
+        }
+        
+      //-----------------------
+          $('#loader').show();
+     var formData = new FormData();
+
+     formData.append('FirstName', $('#FirstName').val());
+     formData.append('LastName', $('#LastName').val());
+     formData.append('EmailAddress', $('#EmailAddress').val());
+     formData.append('MobileNumber', $('#MobileNumber').val());
+     formData.append('PanNumber', $('#PanNumber').val());
+     formData.append('passportNumber', $('#passportNumber').val());
+     formData.append('DateOfBirth', $('#DateOfBirth').val());
+      formData.append('DateOfJoinee', $('#DateOfJoinee').val());
+     formData.append('CountryId', parseInt($('#CountryId').val(), 10));
+     formData.append('StateId', parseInt($('#StateId').val(), 10));
+     formData.append('CityId', parseInt($('#CityId').val(), 10));
+       formData.append("ProfileImageFile", $('#ProfileImageFile')[0].files[0]);
+     formData.append('Gender', $('input[name="gender"]:checked').val());
+     formData.append('isActive', $('#isActive').prop('checked'));
+        formData.append("ProfileImage", $('#FirstName').val());
+
+             var isValid = true;
+        var errorMessage = "";
+
+        formData.forEach(function(value, key) {
+            if (!value || (typeof value === 'number' && isNaN(value))) {
+                isValid = false;
+                errorMessage += key + " is required.\n";
+            }
+        });
+
+        if (!isValid) {
+            $('#loader').hide();
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: errorMessage,
+                confirmButtonText: 'OK'
+            });
+            return; 
+        }
+
+            $.ajax({
+        url: '@Url.Action("InsertEmployeeData", "Home")',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            $('#loader').hide();
+            
+            if (response.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: response.message,
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false, 
+                    allowEscapeKey: false,
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                       // window.location.href = '@Url.Action("Index", "Home")';
+                           GetEmployeeList1();
+                           $('#employeeForm')[0].reset();
+                          $('#employeeTable').show();
+                              $('#Save').hide();
+                            $('#employeeForm').hide();
+                    }
+                });
+
+           }
+            else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: response.message,
+                    confirmButtonText: 'OK'
+                });
+            }
+                 
+          //   GetEmployeeList1();
+        },
+        error: function (xhr, status, error) {
+            $('#loader').hide();
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred: ' + error,
+                confirmButtonText: 'OK'
+            });
+        }
+
+    });
+        
+    }
+  
+        function GetEmployeeList12() {
+             $('#loader').show();
+        $.ajax({
+            url: '@Url.Action("GetEmployeeData", "Home")', 
+            type: 'GET', 
+            success: function (response) {
+                debugger;
+                // console.log(response);
+                 $('#loader').hide();
+                $('#responseMessage').html('<div class="alert alert-success">Employee data fetched successfully!</div>');
+
+                var tableRows = '';
+                $.each(response, function (index, employee) {
+                       tableRows += '<tr style="border: 2px solid #ddd; ">';
+
+                      var profileImageUrl = employee.profileImage ? employee.profileImage : '/images/default-avatar.jpg';
+
+                    tableRows +=   '<td style="text-align: center;">' + employee.firstName + '</td>';
+                     tableRows += '<td style="text-align: center;">' + employee.lastName + '</td>';
+                     tableRows += '<td style="text-align: center;">' + employee.emailAddress + '</td>';
+                     tableRows += '<td style="text-align: center;">' + employee.mobileNumber + '</td>';
+                     tableRows += '<td style="text-align: center;">' + employee.panNumber + '</td>';
+                     tableRows += '<td style="text-align: center;">' + employee.passportNumber + '</td>';
+                     tableRows += '<td style="text-align: center;">' + employee.dateOfBirth + '</td>';
+                     tableRows += '<td style="text-align: center;">' + employee.dateOfJoinee + '</td>';
+                     // tableRows += '<td style="text-align: center;">' + employee.countryId + '</td>';
+                     // tableRows += '<td style="text-align: center;">' + employee.stateId + '</td>';
+                     // tableRows += '<td style="text-align: center;">' + employee.cityId + '</td>';
+
+                         tableRows += '<td style="text-align: center;">' + employee.countryName + '</td>';
+                       tableRows += '<td style="text-align: center;">' + employee.stateName + '</td>';
+                       tableRows += '<td style="text-align: center;">' + employee.cityName + '</td>';
+
+                    tableRows +=  '<td style="text-align: center;">' + employee.gender + '</td>';
+                     tableRows += '<td style="text-align: center;">' + (employee.isActive ) + '</td>';
+                     tableRows += '<td ><img src="' + profileImageUrl + '" alt="Profile Image" width="50px" height="50px" /></td>';
+                     tableRows += '<td style="text-align: center;"> <button class="btn btn-primary edit-btn" data-id="' + employee.row_Id + '">Edit</button></td>';
+                     tableRows += '<td style="text-align: center;"> <button class="btn btn-danger delete-btn" data-id="' + employee.row_Id + '">Delete</button></td>';
+
+                    tableRows += '</tr>';
+                });
+
+                // Insert the rows into the table body
+                $('#employeeTable tbody').html(tableRows);
+
+                    var table = $j('#employeeTable').DataTable();
+                        table.clear().draw(); // Clear current table data
+                      table.rows.add(response).draw(); // Add new data and draw the table
+                // Reinitialize the DataTable to apply pagination, sorting, etc.
+              //  $('#employeeTable').DataTable();
+             //    var tableSelector = '#employeeTable';
+             //     if ($j.fn.dataTable.isDataTable(tableSelector)) {
+             //     $j('#employeeTable').DataTable().destroy();
+             // }
+
+             //    $('#employeeTable').DataTable({
+             //     "paging": true,           // Enable pagination
+             //     "searching": true,        // Enable search
+             //     "ordering": true,         // Enable sorting
+             //     "info": true,             // Show table info
+             //     "autoWidth": false,       // Disable auto width for columns
+             //     "columnDefs": [
+             //         { "orderable": false, "targets": [13, 14] }  // Disable sorting on 'Actions' columns (Edit, Delete)
+             //     ]
+             // });
+            },
+            error: function (xhr, status, error) {
+                 $('#loader').hide();
+                $('#responseMessage').html('<div class="alert alert-danger">Error occurred: ' + error + '</div>');
+            }
+        });
+    }
+        function GetEmployeeList1() {
+        $('#loader').show();
+        $.ajax({
+            url: '@Url.Action("GetEmployeeData", "Home")',
+            type: 'GET',
+            success: function (response) {
+               
+                var tableRows = [];
+                $.each(response, function (index, employee) {
+                    var profileImageUrl = employee.profileImage ? employee.profileImage : '/uploads/default-avatar.jpg';
+                     var isActiveText = employee.isActive === 1 ? "Yes" : "No";
+
+                    tableRows.push([
+                        employee.firstName,
+                        employee.lastName,
+                        employee.emailAddress,
+                        employee.mobileNumber,
+                        employee.panNumber,
+                        employee.passportNumber,
+                        employee.dateOfBirth,
+                        employee.dateOfJoinee,
+                        employee.countryName,
+                        employee.stateName,
+                        employee.cityName,
+                        employee.gender,
+                       isActiveText,
+                    '<img src="' + profileImageUrl + '" alt="Profile Image" width="50px" height="50px" />',
+                        '<button class="btn btn-primary edit-btn" data-id="' + employee.row_Id + '">Edit</button>',
+                        '<button class="btn btn-danger delete-btn" data-id="' + employee.row_Id + '">Delete</button>'
+                      //      tableRows += '<td style="text-align: center;"> <button class="btn btn-primary edit-btn" data-id="' + employee.row_Id + '">Edit</button></td>';
+                      // tableRows += '<td style="text-align: center;"> <button class="btn btn-danger delete-btn" data-id="' + employee.row_Id + '">Delete</button></td>';
+                      
+                    ]);
+                });
+
+                var table = $j('#employeeTable').DataTable();
+                table.clear().draw(); // Clear existing data
+                table.rows.add(tableRows).draw(); // Add new rows
+                $('#responseMessage').html('<div class="alert alert-success">Employee data fetched successfully!</div>');
+                 $('#loader').hide();
+             //        $('#employeeTable').on('click', '.delete-btn', function () {
+             //     var employeeId = $j(this).data('id');
+             //     if (confirm('Are you sure you want to delete this employee?')) {
+             //         $.ajax({
+             //             url: '@Url.Action("DeleteEmployeeById", "Home")',
+             //             type: 'POST',
+             //             data: { id: employeeId },
+             //             success: function (response) {
+             //                 GetEmployeeList1();  // Refresh the list after deletion
+             //             },
+             //             error: function (xhr, status, error) {
+             //                 alert('Error occurred while deleting the employee. Please try again.');
+             //             }
+             //         });
+             //     }
+             // });
+            },
+            error: function (xhr, status, error) {
+                $('#loader').hide();
+                $('#responseMessage').html('<div class="alert alert-danger">Error occurred: ' + error + '</div>');
+            }
+        });
+    }
+
+      //--------------
+
+        var $j = jQuery.noConflict();
+           var dropdownData;
+
+        $j(document).ready(function () {
+            //-----------------
+
+                      $('#employeeTable').show();
+            $('#employeeForm').hide();
+            $('#Save').hide();
+            // Handle click on 'Add Employee' button
+            $('#addEmployeeBtn').click(function() {
+                // Hide the table and show the form
+                    $('#employeeTable').hide();
+                $('#employeeForm').show();
+                    $('#Save').show();
+          //  window.location.href='@Url.Action("Create", "Home");
+            });
+
+            $('#listEmployeesBtn').click(function() {
+                    GetEmployeeList1();
+                $('#employeeForm').hide();
+                $('#employeeTable').show();
+                    $('#Save').hide();
+            });
+
+            //------------
+                        $('#loader').show();
+                var tableSelector = '#employeeTable';
+     if ($j.fn.DataTable.isDataTable(tableSelector)) {
+         // Clear and destroy the existing DataTable
+         $j(tableSelector).DataTable().clear().destroy();
+     }
+  
+                 $j('#employeeTable').DataTable({
+                    "paging": true,           // Enable pagination
+                    "searching": true,        // Enable search
+                    "ordering": true,         // Enable sorting
+                    "info": true,             // Show table info
+                    "autoWidth": false,       // Disable auto width for columns
+                    "columnDefs": [
+                        { "orderable": false, "targets": [13, 14] }  // Disable sorting on 'Actions' columns (Edit, Delete)
+                    ]
+                });
+                   
+        $.ajax({
+             url: '@Url.Action("GetAllDropdownsData", "Home")',
+            type: 'GET',
+            success: function (data) {
+               // console.log(data);
+                    dropdownData =data ;
+                $.each(data.countries, function (index, country) {
+                    $('#CountryId').append('<option value="' + country.id + '">' + country.name + '</option>');
+                });
+
+                $.each(data.states, function (index, state) {
+                    $('#StateId').append('<option value="' + state.id + '">' + state.name + '</option>');
+                });
+
+                $.each(data.cities, function (index, city) {
+                    $('#CityId').append('<option value="' + city.id + '">' + city.name + '</option>');
+                });
+                      GetEmployeeList1();
+                        $('#loader').hide();
+            },
+            error: function (xhr, status, error) {
+                console.error('Error when fetching  data:', error);
+            }
+        });
+    });
+
+    //-------
+      function fetchStates() {
+        var countryId = $('#CountryId').val();
+
+        // Clear existing states and cities
+        $('#StateId').empty().append('<option value="">Select State</option>');
+        $('#CityId').empty().append('<option value="">Select City</option>');
+
+        if (countryId) {
+            // Filter states by selected countryId
+            var filteredStates = dropdownData.states.filter(function(state) {
+                return state.stateId == countryId;
+            });
+
+            // Populate the states dropdown
+            $.each(filteredStates, function (index, state) {
+                $('#StateId').append('<option value="' + state.id + '">' + state.name + '</option>');
+            });
+        }
+    }
+
+    function fetchCities() {
+        var stateId = $('#StateId').val();
+
+        // Clear existing cities
+        $('#CityId').empty().append('<option value="">Select City</option>');
+
+        if (stateId) {
+            // Filter cities by selected stateId
+            var filteredCities = dropdownData.cities.filter(function(city) {
+                return city.stateId == stateId;
+            });
+
+            // Populate the cities dropdown
+            $.each(filteredCities, function (index, city) {
+                $('#CityId').append('<option value="' + city.id + '">' + city.name + '</option>');
+            });
+        }
+    }
+
+        function validateMobileNumber()
+        {
+        var mobileNumberInput = document.getElementById('MobileNumber');
+        var mobileNumber = mobileNumberInput.value;
+        mobileNumber = mobileNumber.replace(/[^0-9]/g, '');
+        if (mobileNumber.length > 10) {
+            mobileNumber = mobileNumber.substring(0, 10);
+        }
+        mobileNumberInput.value = mobileNumber;
+        if (mobileNumber.length !== 10) {
+
+          //  document.getElementById('mobileNumberError').innerText = "Mobile number must be 10 digits.";
+        } else {
+            //document.getElementById('mobileNumberError').innerText = "";
+        }
+    }
+
+   function checkUniqueness() {
+        var panNumber = $('#PanNumber').val().toUpperCase();
+        var passportNumber = $('#passportNumber').val().toUpperCase();
+          var email = $('#EmailAddress').val();
+            var mobile = $('#MobileNumber').val();
+
+        $.ajax({
+            url: '@Url.Action("CheckUniquePanAndPassport", "Home")',
+            type: 'POST',
+            data: {
+                PanNumber: panNumber,
+                PassportNumber: passportNumber,
+               emailaddress :email,
+                    mobilenumber: mobile
+            },
+            success: function(response) {
+                  if (!response.isUnique) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: response.message,
+                confirmButtonText: 'OK'
+            }).then(function(result) {
+                // Clearing the input fields after the alert is closed
+                if (result.isConfirmed) {
+                    $j('#PanNumber').val('');
+                    $j('#passportNumber').val('');
+                }
+            });
+        }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error during uniqueness check:', error);
+            }
+        });
+    }
+ 
+</script>

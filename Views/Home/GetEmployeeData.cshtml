@@ -1,0 +1,112 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model IEnumerable<Employee_Crud_operation.Models.EmployeeMaster>
+
+@{
+    ViewData["Title"] = "---Employees-List-----";
+}
+<h2>Employee List</h2>
+
+<!-- This will show success or error messages -->
+<div id="responseMessage"></div>
+
+<!-- Table to display employee data with DataTable -->
+<table id="employeeTable" class="display">
+    <thead>
+        <tr>
+            
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Mobile Number</th>
+            <th>Pan Number</th>
+            <th>Passport Number</th>
+            <th>Date of Birth</th>
+            <th>Date of Join</th>
+            <th>Country ID</th>
+            <th>State ID</th>
+            <th>City ID</th>
+            <th>Gender</th>
+            <th>Is Active</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- The rows will be populated dynamically via AJAX -->
+    </tbody>
+</table>
+
+<button class="btn btn-primary" onclick="GetEmployeeList1()">Fetch Employee Data</button>
+@* 
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<link rel="stylesheet" href="//cdn.datatables.net/2.2.0/css/dataTables.dataTables.min.css"> <!-- DataTables CSS -->
+<script src="//cdn.datatables.net/2.2.0/js/dataTables.min.js"></script> <!-- DataTables JS -->
+ *@
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery should be loaded first -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css"> <!-- DataTables CSS -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script> <!-- DataTables JS -->
+@* 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" />
+
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script> *@
+
+<!-- JavaScript to initialize DataTable after AJAX load -->
+<script type="text/javascript">
+
+ 
+
+    // $(document).ready(function () {
+    //     // Initialize DataTable after the document is ready
+    //     $('#employeeTable').DataTable();
+    // });
+
+
+    function GetEmployeeList1() {
+        $.ajax({
+            url: '@Url.Action("GetEmployeeData", "Home")',
+            type: 'GET',
+            success: function (response) {
+                  debugger;
+                $('#responseMessage').html('<div class="alert alert-success">Employee data fetched successfully!</div>');
+                   // console.log(response);
+                var tableRows = '';
+                $.each(response, function (index, employee) {
+                    tableRows += '<tr>';
+                    
+                    tableRows += '<td>' + employee.firstName + '</td>';
+                    tableRows += '<td>' + employee.lastName + '</td>';
+                    tableRows += '<td>' + employee.emailAddress + '</td>';
+                    tableRows += '<td>' + employee.mobileNumber + '</td>';
+                    tableRows += '<td>' + employee.panNumber + '</td>';
+                    tableRows += '<td>' + employee.passportNumber + '</td>';
+                    tableRows += '<td>' + employee.dateOfBirth + '</td>';
+                    tableRows += '<td>' + employee.dateOfJoinee + '</td>';
+                    tableRows += '<td>' + employee.countryId + '</td>';
+                    tableRows += '<td>' + employee.stateId + '</td>';
+                    tableRows += '<td>' + employee.cityId + '</td>';
+                    tableRows += '<td>' + employee.gender + '</td>';
+                    tableRows += '<td>' + (employee.isActive ) + '</td>';
+                    tableRows += '</tr>';
+                });
+
+                // Insert the rows into the table body
+                $('#employeeTable tbody').html(tableRows);
+
+                // Reinitialize the DataTable to apply pagination, sorting, etc.
+         //       $('#employeeTable').DataTable();
+            },
+            error: function (xhr, status, error) {
+                $('#responseMessage').html('<div class="alert alert-danger">Error occurred: ' + error + '</div>');
+            }
+        });
+    }
+
+    // GetEmployeeList1();
+
+</script>
+@Html.ActionLink("Go to Home", "Index", "Home")

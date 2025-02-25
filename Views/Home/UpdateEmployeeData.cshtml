@@ -1,0 +1,27 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@* @Html.ActionLink("<--- Back", "Index", "Home", null, new { @class = "back-link" })
+ *@<script>
+    window.location.href = '@Url.Action("Index", "Home")';
+</script>
+
+<style>
+
+    .back-link {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        color: white;
+        background-color: #5bc0de;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s;
+    }
+
+</style>
+
+
+@* @Html.ActionLink("<--- Back", "Index", "Home", null); *@
